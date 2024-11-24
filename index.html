@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <title>Login & Registro</title>
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <nav class="nav">
+            <div class="nav-logo">
+                <p>Galeria Arte.</p>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <ul>
+                    <li><a href="#" class="link active">Home</a></li>
+                    <li><a href="#" class="link">Blog</a></li>
+                    <li><a href="#" class="link">Servicios</a></li>
+                    <li><a href="#" class="link">Acerca de</a></li>
+                </ul>
+            </div>
+            <div class="nav-button">
+                <button class="btn white-btn" id="loginBtn" onclick="login()">Log in</button>
+                <button class="btn" id="registerBtn" onclick="register()">Sign up</button>
+            </div>
+            <div class="nav-menu-btn">
+                <i class="bx bx-menu" onclick="myMenuFunction()"></i>
+            </div>
+        </nav>
+
+        <!-----------------------------Box forma ----------------------------------->    
+        <div class="form-box">
+        
+            <!------------------- login forma -------------------------->
+
+            <div class="login-container" id="login">
+                <div class="top">
+                    <span>No tienes una cuenta? <a href="#" onclick="register()">Registrarse</a></span>
+                    <header>Login</header>
+                </div>
+                <div class="input-box">
+                    <input type="text" class="input-field" id="login-email" placeholder="Usuario o Email">
+                    <i class="bx bx-user"></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" class="input-field" id="login-password" placeholder="Contraseña">
+                    <i class="bx bx-lock-alt"></i>
+                </div>
+                <div class="input-box">
+                    <input type="submit" class="submit" value="Sign In" onclick="checkLogin()">
+                </div>
+                <div class="two-col">
+                    <div class="one">
+                        <input type="checkbox" id="login-check">
+                        <label for="login-check"> Recuerdame</label>
+                    </div>
+                    <div class="two">
+                        <label><a href="#">Olvidaste la contraseña?</a></label>
+                    </div>
+                </div>
+            </div>
+
+            <!------------------- registration form -------------------------->
+            <div class="register-container" id="register">
+                <div class="top">
+                    <span>Tienes una cuenta? <a href="#" onclick="login()">Iniciar Sesión</a></span>
+                    <header>Registrarse</header>
+                </div>
+                <div class="two-forms">
+                    <div class="input-box">
+                        <input type="text" class="input-field" id="first-name" placeholder="Primer Nombre">
+                        <i class="bx bx-user"></i>
+                    </div>
+                    <div class="input-box">
+                        <input type="text" class="input-field" id="last-name" placeholder="Apellido">
+                        <i class="bx bx-user"></i>
+                    </div>
+                </div>
+                <div class="input-box">
+                    <input type="text" class="input-field" id="register-email" placeholder="Email">
+                    <i class="bx bx-envelope"></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" class="input-field" id="register-password" placeholder="Contraseña">
+                    <i class="bx bx-lock-alt"></i>
+                </div>
+                <div class="input-box">
+                    <input type="submit" class="submit" value="Register" onclick="registerUser()">
+                </div>
+                <div class="two-col">
+                    <div class="one">
+                        <input type="checkbox" id="register-check">
+                        <label for="register-check"> Recuerdame</label>
+                    </div>
+                    <div class="two">
+                        <label><a href="#">Terminos & condiciones</a></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>   
+
+    <script>
+        function myMenuFunction() {
+            var i = document.getElementById("navMenu");
+
+            if(i.className === "nav-menu") {
+                i.className += " responsive";
+            } else {
+                i.className = "nav-menu";
+            }
+        }
+
+        var a = document.getElementById("loginBtn");
+        var b = document.getElementById("registerBtn");
+        var x = document.getElementById("login");
+        var y = document.getElementById("register");
+
+        function login() {
+            x.style.left = "4px";
+            y.style.right = "-520px";
+            a.className += " white-btn";
+            b.className = "btn";
+            x.style.opacity = 1;
+            y.style.opacity = 0;
+        }
+
+        function register() {
+            x.style.left = "-510px";
+            y.style.right = "5px";
+            a.className = "btn";
+            b.className += " white-btn";
+            x.style.opacity = 0;
+            y.style.opacity = 1;
+        }
+
+        function registerUser() {
+    // Obtiene los valores de los campos de registro
+    var firstName = document.getElementById("first-name").value;
+    var lastName = document.getElementById("last-name").value;
+    var email = document.getElementById("register-email").value;
+    var password = document.getElementById("register-password").value;
+
+    // Guarda los datos en localStorage
+    localStorage.setItem("firstName", firstName);
+    localStorage.setItem("lastName", lastName);
+    localStorage.setItem("email", email);
+    localStorage.setItem("password", password);
+
+    // Limpia los campos de registro
+    document.getElementById("first-name").value = "";
+    document.getElementById("last-name").value = "";
+    document.getElementById("register-email").value = "";
+    document.getElementById("register-password").value = "";
+
+    // Después del registro, redirige al login
+    login();
+}
+
+
+        function checkLogin() {
+            // Obtiene los valores del login
+            var loginEmail = document.getElementById("login-email").value;
+            var loginPassword = document.getElementById("login-password").value;
+
+            // Obtiene los datos guardados en localStorage
+            var storedEmail = localStorage.getItem("email");
+            var storedPassword = localStorage.getItem("password");
+
+            // Compara los datos
+            if (loginEmail === storedEmail && loginPassword === storedPassword) {
+                // Redirige a la página de inicio
+                window.location.href = "home.html";
+            } else {
+                alert("Usuario o contraseña incorrectos");
+            }
+        }
+
+        function redirectToHome() {
+            window.location.href = "home.html";  
+        }
+    </script>
+
+</body>
+</html>
