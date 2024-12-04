@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Contacto</title>
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+  <style>
+    /* Estilos generales */
+    body {
+      background-color: #f5f5f5;
+      font-family: Arial, sans-serif;
+    }
+
+    .navbar {
+      background-color: #343a40;
+    }
+
+    .navbar-brand {
+      color: #fff;
+      font-size: 30px;
+      font-weight: 600;
+    }
+
+    .navbar-nav .nav-item .nav-link {
+      color: #fff;
+      font-size: 18px;
+      padding: 15px 25px;
+    }
+
+    .navbar-nav .nav-item .nav-link:hover {
+      background-color: #495057;
+      border-radius: 5px;
+    }
+
+    .container {
+      margin-top: 50px;
+    }
+
+    .contact-title {
+      text-align: center;
+      font-size: 40px;
+      font-weight: 600;
+      color: #343a40;
+      margin-bottom: 30px;
+    }
+
+    .comment-section {
+      margin-top: 30px;
+    }
+
+    .comment-box {
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .comment-box .author {
+      font-weight: bold;
+    }
+
+    .comment-box .message {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Barra de navegación -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" href="#">Galería de Arte</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="home.html">Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="viajes.html">Galería de Viajes</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="#">Acerca de</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Título de la página de contacto -->
+  <h1 class="contact-title">Contacto</h1>
+
+  <!-- Formulario de comentarios -->
+  <div class="container">
+    <form id="commentForm">
+      <div class="mb-3">
+        <label for="author" class="form-label">Tu nombre</label>
+        <input type="text" class="form-control" id="author" required />
+      </div>
+      <div class="mb-3">
+        <label for="comment" class="form-label">Tu comentario</label>
+        <textarea class="form-control" id="comment" rows="4" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Enviar Comentario</button>
+    </form>
+
+    <!-- Sección de comentarios -->
+    <div class="comment-section" id="commentsSection">
+      <h3>Comentarios:</h3>
+      <!-- Los comentarios se agregarán aquí -->
+    </div>
+  </div>
+
+  <script>
+    // Función para cargar los comentarios desde localStorage
+    function loadComments() {
+      const comments = JSON.parse(localStorage.getItem('galleryComments')) || [];
+      const commentsSection = document.getElementById('commentsSection');
+      commentsSection.innerHTML = '<h3>Comentarios:</h3>';
+      
+      comments.forEach(comment => {
+        const commentBox = document.createElement('div');
+        commentBox.classList.add('comment-box');
+        
+        const author = document.createElement('div');
+        author.classList.add('author');
+        author.textContent = comment.author;
+
+        const message = document.createElement('div');
+        message.classList.add('message');
+        message.textContent = comment.message;
+
+        commentBox.appendChild(author);
+        commentBox.appendChild(message);
+        commentsSection.appendChild(commentBox);
+      });
+    }
+
+    // Función para guardar un comentario en localStorage
+    function saveComment(author, message) {
+      const comments = JSON.parse(localStorage.getItem('galleryComments')) || [];
+      comments.push({ author, message });
+      localStorage.setItem('galleryComments', JSON.stringify(comments));
+    }
+
+    // Manejo del formulario de comentarios
+    document.getElementById('commentForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const author = document.getElementById('author').value;
+      const comment = document.getElementById('comment').value;
+
+      if (author && comment) {
+        saveComment(author, comment);
+        loadComments(); // Recargar los comentarios después de agregar uno nuevo
+      }
+
+      // Limpiar el formulario
+      document.getElementById('author').value = '';
+      document.getElementById('comment').value = '';
+    });
+
+    // Cargar los comentarios al cargar la página
+    window.onload = function () {
+      loadComments();
+    };
+  </script>
+
+  <script src="js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

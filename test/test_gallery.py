@@ -6,7 +6,6 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.alert import Alert
 
 @pytest.fixture(scope="function")
 def driver():
@@ -19,88 +18,156 @@ def driver():
     
     driver.quit()  # Cierra el navegador después de la prueba
 
-# Prueba principal
-def test_homepage(driver):
+def test_register_and_login(driver):
+    # Abrir la página inicial
     driver.get("file:///C:/Users/Hans/Desktop/PaginaWeb/PaginaWeb/index.html")
 
-    # Esperar hasta que el formulario de login esté visible
-    WebDriverWait(driver, 30).until(
+    # Hacer clic en el botón de 'Sign up' para abrir el formulario de registro
+    register_button = driver.find_element(By.ID, "registerBtn")
+    register_button.click()
+
+    # Espera a que el formulario de registro esté visible
+    WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.ID, "register"))
+    )
+
+    # Llenar los campos de registro
+    first_name = driver.find_element(By.ID, "first-name")
+    last_name = driver.find_element(By.ID, "last-name")
+    register_email = driver.find_element(By.ID, "register-email")
+    register_password = driver.find_element(By.ID, "register-password")
+
+    first_name.send_keys("Hansell")
+    last_name.send_keys("Boni")
+    register_email.send_keys("Hansell.boni@gmail.com")
+    register_password.send_keys("123456")
+
+    # Hacer clic en el botón de registro
+    register_submit_button = driver.find_element(By.XPATH, '//input[@value="Register"]')
+    register_submit_button.click()
+
+    # Esperar a que el formulario de registro se oculte y el de login sea visible
+    WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.ID, "login"))
     )
 
-    # Simular el registro para que los datos estén en localStorage
-    driver.execute_script(""" 
-        localStorage.setItem('firstName', 'Test');
-        localStorage.setItem('lastName', 'User');
-        localStorage.setItem('email', 'testuser@example.com');
-        localStorage.setItem('password', 'testpassword123');
-    """)
-
+    # Iniciar sesión con las credenciales registradas
     login_email = driver.find_element(By.ID, "login-email")
     login_password = driver.find_element(By.ID, "login-password")
-    
-    # Completar el formulario de login
-    login_email.send_keys("testuser@example.com")
-    login_password.send_keys("testpassword123")
-    driver.save_screenshot("login_informacion.png")
+
+    login_email.send_keys("Hansell.boni@gmail.com")
+    login_password.send_keys("123456")
 
     # Hacer clic en el botón de login
     submit_button = driver.find_element(By.XPATH, '//input[@value="Sign In"]')
     submit_button.click()
-    driver.save_screenshot("login_exitoso.png")
 
-    # Manejar posibles alertas (si la autenticación falla)
-    try:
-        WebDriverWait(driver, 10).until(EC.alert_is_present())
-        alert = Alert(driver)
-        alert.accept()  # Cierra la alerta de "Usuario o contraseña incorrectos"
-    except:
-        pass  # Si no hay alerta, continúa
+    # Verificar que después del login, se redirige a la página home.html
+    WebDriverWait(driver, 10).until(EC.url_contains("home.html"))
 
-    # Esperar a que se redirija a la página "home.html"
-    WebDriverWait(driver, 30).until(EC.url_contains("home.html"))
-    
+    # Tomar una captura de pantalla para confirmar que estamos en la página correcta
+    driver.save_screenshot("home_page_after_login.png")
+
+    # Verificar que la URL contiene "home.html", indicando que se ha redirigido correctamente
     assert "home.html" in driver.current_url
 
-    assert driver.title == "Galería de Arte"
+    # Verificar galería de arte
+    driver.save_screenshot("gallery_home.png")
 
-    gallery_images = WebDriverWait(driver, 30).until(
-        EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".gallery-item img"))
+    # Asegurarse de que el botón flotante "+" esté presente y clickeable
+    floating_button = WebDriverWait(driver, 30).until(
+        EC.element_to_be_clickable((By.ID, "floating-btn"))
     )
 
-    # Verificar que hay imágenes en la galería
-    assert len(gallery_images) > 0
+    floating_button.click()  # Clic en el botón flotante para mostrar los botones de subida
 
-    # Hacer clic en la primera imagen para abrir el modal
-    gallery_images[0].click()
-
-    # Esperar hasta que el modal esté visible
+    # Esperar hasta que el contenedor de subida sea visible
     WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.ID, "gallery-modal"))
-    )
-    driver.save_screenshot("homepage_photozoom.png")
-
-    # Verificar que el modal contiene la imagen correcta
-    modal_image = driver.find_element(By.ID, "modal-img")
-    assert modal_image.get_attribute("src") == gallery_images[0].get_attribute("src")
-    driver.save_screenshot("gallery_images.png")
-
-    #  simular el clic en el botón de registro y tomar una captura de pantalla de la página de registro ---
-    
-    # Regresar a la página de inicio (index.html) antes de hacer clic en el registro
-    driver.get("file:///C:/Users/Hans/Desktop/PaginaWeb/PaginaWeb/index.html")
-    
-    WebDriverWait(driver, 20).until(
-        EC.visibility_of_element_located((By.ID, "login"))
-    )
-    
-    register_button = driver.find_element(By.ID, "registerBtn")
-    register_button.click()
-
-    WebDriverWait(driver, 20).until(
-        EC.visibility_of_element_located((By.ID, "register"))
+        EC.visibility_of_element_located((By.ID, "upload-container"))
     )
 
-    driver.save_screenshot("registration_page.png")
+    # Verifica si el contenedor de subida es visible
+    upload_container = driver.find_element(By.ID, "upload-container")
+    assert upload_container.is_displayed()
 
-    assert driver.title == "Login & Registro"  
+    # Verificar que el botón de "Subir Imagen" esté visible y clickeable
+    upload_button = driver.find_element(By.XPATH, "//button[@type='submit']")
+    assert upload_button.is_displayed()
+
+    # Esperar un momento para asegurar que el archivo se haya cargado
+    time.sleep(5)
+
+    # Tomar captura antes de continuar
+    driver.save_screenshot("before_wait.png")
+
+    # Esperar para que el usuario vea la imagen cargada
+    input("Presiona Enter para continuar después de que veas la imagen subida en la página...")
+
+    # Tomar captura de la imagen subida
+    driver.save_screenshot("image_uploaded.png")
+    try:
+        close_modal_button = WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, ".modal .close"))
+        )
+        close_modal_button.click()
+    except:
+        pass
+
+    # Hacer clic en el botón "Galería de Viajes" para redirigir a viajes.html
+    gallery_button = driver.find_element(By.XPATH, "//a[contains(text(), 'Galería de Viajes')]")
+    gallery_button.click()
+
+    # Verificar que la URL cambia a viajes.html
+    WebDriverWait(driver, 5).until(EC.url_contains("viajes.html"))
+
+    # Dar tiempo para que subas otra foto en la galería de viajes
+    input("Presiona Enter cuando hayas subido una foto en la galería de viajes...")
+
+
+    # Esperar a que el archivo se cargue
+    time.sleep(5)
+        
+    # Espera para que el usuario vea la imagen cargada
+    input("Presiona Enter para continuar después de que veas la imagen subida en la página...")
+
+    # Tomar captura de la imagen subida
+    driver.save_screenshot("image_uploaded_viajes.png")
+    
+    # Finalizar la prueba
+    time.sleep(2)
+    
+    gallery_button = driver.find_element(By.XPATH, "//a[contains(text(), 'Contacto')]")
+    gallery_button.click()
+
+    WebDriverWait(driver, 10).until(EC.url_contains("contacto.html"))
+
+    author = driver.find_element(By.ID, "author")
+    comment = driver.find_element(By.ID, "comment")
+
+    author.send_keys("Hansell Boni")
+    comment.send_keys("¡Este es un comentario de prueba!")
+
+    # Hacer clic en el botón de "Enviar Comentario"
+    submit_button = driver.find_element(By.XPATH, "//button[@type='submit']")
+    submit_button.click()
+
+    # Esperar 2 segundos para que el comentario se agregue y se vea
+    time.sleep(2)
+
+    # Verificar que el comentario y el autor aparezcan en la sección de comentarios
+    comment_section = driver.find_element(By.ID, "commentsSection")
+
+    # Buscar el comentario más reciente
+    last_comment = comment_section.find_elements(By.CLASS_NAME, "comment-box")[-1]
+    comment_author = last_comment.find_element(By.CLASS_NAME, "author").text
+    comment_message = last_comment.find_element(By.CLASS_NAME, "message").text
+
+    # Verificar si el nombre y el comentario son correctos
+    assert comment_author == "Hansell Boni"
+    assert comment_message == "¡Este es un comentario de prueba!"
+
+    # Tomar una captura de pantalla para confirmar visualmente
+    driver.save_screenshot("confirmation_comentario.png")
+
+    # Finalizar la prueba
+    time.sleep(2)

@@ -5,8 +5,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <title>Galería de Arte</title>
+  <title>Galería de Viajes</title>
   <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="css/imges.css" />
   <style>
     /* Barra de navegación */
     .navbar {
@@ -39,6 +40,7 @@
       padding: 30px 0;
     }
 
+    /* Estilo para centrar el título */
     .gallery-title {
       text-align: center;
       font-size: 40px;
@@ -47,6 +49,7 @@
       color: #343a40;
     }
 
+    /* Estilos para las imágenes de la galería */
     .gallery-item {
       position: relative;
       margin-bottom: 20px;
@@ -57,7 +60,6 @@
       height: auto;
       border-radius: 10px;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
-      cursor: pointer;
     }
 
     .gallery-item img:hover {
@@ -65,25 +67,27 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
 
+    /* Estilo del botón de eliminar */
     .delete-btn {
       position: absolute;
       top: 10px;
       right: 10px;
-      background-color: #000;
-      color: white;
+      background-color: #000; /* Fondo negro */
+      color: white; /* Texto blanco */
       border: none;
-      border-radius: 5px;
+      border-radius: 5px; /* Bordes suavizados */
       padding: 10px;
       cursor: pointer;
       font-size: 18px;
       z-index: 1;
     }
 
+    /* Estilo para el formulario de subida */
     .upload-container {
       position: fixed;
       bottom: 50px;
       right: 20px;
-      display: none;
+      display: none; /* Se oculta hasta que el botón flote se presione */
       text-align: center;
       z-index: 100;
     }
@@ -101,6 +105,7 @@
       font-size: 18px;
     }
 
+    /* Botón flotante */
     .floating-btn {
       position: fixed;
       bottom: 20px;
@@ -122,21 +127,12 @@
     .floating-btn:hover {
       background-color: #0056b3;
     }
-
-    .modal-content {
-      text-align: center;
-    }
-
-    .modal-img {
-      max-width: 100%;
-      max-height: 500px;
-      margin: 0 auto;
-    }
   </style>
 </head>
 
 <body>
 
+  <!-- Barra de navegación -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <a class="navbar-brand" href="#">Galería de Arte</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -161,14 +157,15 @@
     </div>
   </nav>
 
-  <h1 class="gallery-title">Galería de Arte</h1>
+  <!-- Título centrado de la galería -->
+  <h1 class="gallery-title">Galería de Viajes</h1>
 
+  <!-- Galería de imágenes -->
   <div class="container gallery-container">
-    <div class="row g-4" id="gallery">
-      <!-- Las imágenes actuales se cargarán aquí -->
-    </div>
+    <div class="row g-4" id="gallery"></div>
   </div>
 
+  <!-- Formulario para subir imagen -->
   <div class="upload-container" id="upload-container">
     <form id="upload-form" onsubmit="handleImageUpload(event)">
       <label for="file-upload">Subir imagen</label>
@@ -177,42 +174,40 @@
     </form>
   </div>
 
-  <div class="floating-btn" id="floating-btn">+</div>
+  <!-- Botón flotante para mostrar el formulario -->
+  <div class="floating-btn" id="floating-btn">
+    +
+  </div>
 
+  <!-- Modal para ver imagen ampliada -->
   <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="imageModalLabel"></h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
         <div class="modal-body">
-          <img id="modalImage" class="modal-img" src="" alt="Imagen ampliada">
+          <img id="modalImage" src="" class="img-fluid" alt="Imagen ampliada">
         </div>
       </div>
     </div>
   </div>
 
   <script>
-  document.getElementById('floating-btn').addEventListener('click', function () {
-  const uploadContainer = document.getElementById('upload-container');
-  // Asegúrate de que el contenedor esté oculto inicialmente
-  if (uploadContainer.style.display === 'none' || uploadContainer.style.display === '') {
-    uploadContainer.style.display = 'block';
-  } else {
-    uploadContainer.style.display = 'none';
-  }
-  });
+    // Mostrar/Ocultar formulario de carga
+    document.getElementById('floating-btn').addEventListener('click', function () {
+      const uploadContainer = document.getElementById('upload-container');
+      uploadContainer.style.display = (uploadContainer.style.display === 'none') ? 'block' : 'none';
+    });
 
-
+    // Eliminar imagen de la galería
     function deleteImage(button) {
       const imageElement = button.closest('.gallery-item');
-      imageElement.remove();
-      updateLocalStorage();
+      imageElement.remove(); // Elimina la imagen clickeada
+      updateLocalStorage(); // Actualiza localStorage después de eliminar
     }
 
+    // Manejo de subida de imagen
     function handleImageUpload(event) {
-      event.preventDefault();
+      event.preventDefault(); // Prevenir que el formulario se recargue
+
       const fileInput = document.getElementById('file-upload');
       const file = fileInput.files[0];
       if (file) {
@@ -220,13 +215,15 @@
         reader.onload = function (e) {
           const imgElement = document.createElement('img');
           imgElement.src = e.target.result;
+          imgElement.alt = file.name;
           imgElement.classList.add('img-fluid');
+          imgElement.classList.add('gallery-item');
           imgElement.setAttribute('data-bs-toggle', 'modal');
           imgElement.setAttribute('data-bs-target', '#imageModal');
 
           const col = document.createElement('div');
           col.classList.add('col-sm-6', 'col-md-4', 'gallery-item');
-
+          
           const deleteButton = document.createElement('button');
           deleteButton.classList.add('delete-btn');
           deleteButton.textContent = '×';
@@ -237,36 +234,32 @@
           col.appendChild(imgElement);
           col.appendChild(deleteButton);
           document.getElementById('gallery').appendChild(col);
+          
+          // Guardar la imagen en localStorage
           saveImageToLocalStorage(e.target.result);
+
+          // Cerrar el formulario de subida
           document.getElementById('upload-container').style.display = 'none';
         };
         reader.readAsDataURL(file);
       }
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-      loadImagesFromLocalStorage();
-    });
-
-    function saveImageToLocalStorage(imageData) {
-      const images = JSON.parse(localStorage.getItem('images')) || [];
-      images.push(imageData);
-      localStorage.setItem('images', JSON.stringify(images));
-    }
-
+    // Cargar imágenes desde localStorage
     function loadImagesFromLocalStorage() {
-      const images = JSON.parse(localStorage.getItem('images')) || [];
-      const gallery = document.getElementById('gallery');
-      images.forEach(function (imageData) {
+      const images = JSON.parse(localStorage.getItem('galleryImages')) || [];
+      const galleryContainer = document.getElementById('gallery');
+      images.forEach(imageData => {
         const col = document.createElement('div');
         col.classList.add('col-sm-6', 'col-md-4', 'gallery-item');
-
+        
         const imgElement = document.createElement('img');
         imgElement.src = imageData;
         imgElement.classList.add('img-fluid');
+        imgElement.classList.add('gallery-item');
         imgElement.setAttribute('data-bs-toggle', 'modal');
         imgElement.setAttribute('data-bs-target', '#imageModal');
-
+        
         const deleteButton = document.createElement('button');
         deleteButton.classList.add('delete-btn');
         deleteButton.textContent = '×';
@@ -276,25 +269,34 @@
 
         col.appendChild(imgElement);
         col.appendChild(deleteButton);
-        gallery.appendChild(col);
+        galleryContainer.appendChild(col);
       });
     }
 
+    // Guardar imagen en localStorage
+    function saveImageToLocalStorage(imageData) {
+      const images = JSON.parse(localStorage.getItem('galleryImages')) || [];
+      images.push(imageData);
+      localStorage.setItem('galleryImages', JSON.stringify(images));
+    }
+
+    // Actualizar localStorage después de eliminar una imagen
     function updateLocalStorage() {
-      const gallery = document.getElementById('gallery');
-      const images = [];
-      gallery.querySelectorAll('.gallery-item img').forEach(function (img) {
-        images.push(img.src);
-      });
-      localStorage.setItem('images', JSON.stringify(images));
+      const galleryItems = document.querySelectorAll('.gallery-item img');
+      const images = Array.from(galleryItems).map(img => img.src);
+      localStorage.setItem('galleryImages', JSON.stringify(images));
     }
 
-    document.addEventListener("click", function (event) {
-      if (event.target.tagName === "IMG" && event.target.hasAttribute("data-bs-toggle")) {
-        const modalImage = document.getElementById("modalImage");
-        modalImage.src = event.target.src;
-      }
+    // Ver imagen ampliada en el modal
+    document.getElementById('imageModal').addEventListener('show.bs.modal', function (event) {
+      const button = event.relatedTarget;
+      const imgSrc = button.getAttribute('src');
+      const modalImage = document.getElementById('modalImage');
+      modalImage.src = imgSrc;
     });
+
+    // Cargar imágenes al inicio
+    loadImagesFromLocalStorage();
   </script>
   <script src="js/bootstrap.bundle.min.js"></script>
 </body>
